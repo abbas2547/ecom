@@ -30,6 +30,9 @@ const newArrivals = [
   { name: 'Riviera Collar Shirt', price: 45, originalPrice: 60, image: 'https://framerusercontent.com/images/4zsYQkMwe0g61iw8T3MZGzvhak.png?width=961&height=1024', isNew: true },
   { name: 'Stretch Jersey Tee', price: 65, originalPrice: 95, image: 'https://framerusercontent.com/images/0g1kqNpbGUbeCR7eDqHjDWiv4s.png?width=937&height=1024', isNew: true },
   { name: 'Urban Utility Cargo', price: 90, originalPrice: 120, image: 'https://framerusercontent.com/images/cWQhDyWBhK2dbOvMbEutN5jO0s.png?width=891&height=1024', isNew: true },
+  { name: 'Minimalist Linen Blazer', price: 120, originalPrice: 160, image: 'https://framerusercontent.com/images/FFAlreqmltBbtn7iNy9lIQTMI.png?width=968&height=1024', isNew: true },
+  { name: 'Classic Denim Jacket', price: 95, originalPrice: 130, image: 'https://framerusercontent.com/images/6nknFZTNUtU9BA1FnqLy7dPrtmE.png?width=1024&height=1024', isNew: true },
+  { name: 'Soft Wool Cardigan', price: 110, originalPrice: 150, image: 'https://framerusercontent.com/images/XY7DXjHvJ7qxI2SulzDqvBiRbvw.png?width=944&height=1024', isNew: true },
 ]
 
 const bestSellers = [
@@ -37,6 +40,10 @@ const bestSellers = [
   { name: 'Patterned Knit Sweater', price: 45, originalPrice: 90, image: 'https://framerusercontent.com/images/FNS875X1XnR0GJd4UpTh1Zms.png?width=817&height=987', isBestSeller: true },
   { name: 'Quilted Bomber Jacket', price: 145, originalPrice: 180, image: 'https://framerusercontent.com/images/E6tqcNcNIbkMCzBYvnABQBtwcM.jpeg?scale-down-to=1024&width=1280&height=1280', isBestSeller: true },
   { name: 'Hooded Puffer Vest', price: 45, originalPrice: 75, image: 'https://framerusercontent.com/images/MLJe7H4csZkBunu5nEk84enCjM.png?width=965&height=1024', isBestSeller: true },
+  { name: 'Premium Cotton T-Shirt', price: 35, originalPrice: 55, image: 'https://framerusercontent.com/images/VW4VJmmdCt9WP6FoBGWnqDq6VS8.png?width=950&height=1024', isBestSeller: true },
+  { name: 'Flex Jogger Pants', price: 75, originalPrice: 100, image: 'https://framerusercontent.com/images/liIxg0opfCsW1pRixs56aS3Aj4.jpeg?scale-down-to=1024&width=1248&height=816', isBestSeller: true },
+  { name: 'Sleek Chino Shorts', price: 55, originalPrice: 80, image: 'https://framerusercontent.com/images/imHLb05OBp3rVa7DL12JicfwlE.png?width=956&height=1024', isBestSeller: true },
+  { name: 'Essential V-Neck Tee', price: 39, originalPrice: 60, image: 'https://framerusercontent.com/images/4zsYQkMwe0g61iw8T3MZGzvhak.png?width=961&height=1024', isBestSeller: true },
 ]
 
 const collections = [
@@ -83,7 +90,10 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
   return (
     <nav className="fixed top-0 left-0 w-full bg-transparent backdrop-blur-md border-b border-white/20 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center bg-black/10">
-        <div className="text-2xl font-light tracking-wider text-white">ZYROX</div>
+        <div className="flex items-center space-x-3">
+         
+          <div className="text-2xl font-light tracking-wider text-white">ELUEE</div>
+        </div>
         
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-8 text-sm text-white">
@@ -91,7 +101,7 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
           <a href="#about" className="hover:text-gray-200 transition">About</a>
           <a href="#collections" className="hover:text-gray-200 transition">Shop</a>
           <a href="#blog" className="hover:text-gray-200 transition">Blog</a>
-          <a href="#contact" className="hover:text-gray-200 transition">Contact</a>
+          <a href="https://instagram.com/eluue2547" target="_blank" className="hover:text-gray-200 transition">Contact</a>
           <a href="/login" className="hover:text-gray-200 transition">Login</a>
         </div>
 
@@ -142,9 +152,27 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
   )
 }
 
-// Cart Sidebar Component
+// Cart Sidebar Component - Enhanced Design
 function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boolean, onClose: () => void, cartCount: number, onRemoveItem: () => void }) {
   if (!isOpen) return null
+
+  const cartItems = Array.from({ length: cartCount }).map((_, i) => {
+    const itemNames = [
+      'Textured Knitted Shirt',
+      'Structured Trench Coat',
+      'Mini Denim Overalls',
+      'Riviera Collar Shirt',
+      'Stretch Jersey Tee',
+      'Urban Utility Cargo',
+      'Minimalist Linen Blazer',
+      'Classic Denim Jacket',
+      'Heavyweight Oversized Hoodie',
+      'Patterned Knit Sweater',
+      'Quilted Bomber Jacket',
+      'Hooded Puffer Vest',
+    ]
+    return itemNames[i % itemNames.length]
+  })
 
   return (
     <>
@@ -152,61 +180,100 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/40 z-40"
+        className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
         onClick={onClose}
       >
         <motion.div
           initial={{ x: 400 }}
           animate={{ x: 0 }}
           exit={{ x: 400 }}
-          className="fixed right-0 top-0 h-screen w-80 bg-white z-50 flex flex-col"
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          className="fixed right-0 top-0 h-screen w-full max-w-sm bg-gradient-to-br from-white to-gray-50 z-50 flex flex-col shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex justify-between items-center p-6 border-b">
-            <h2 className="text-2xl font-light">Shopping Cart</h2>
+          {/* Header */}
+          <div className="bg-gradient-to-r from-black to-gray-800 text-white p-6 flex justify-between items-center rounded-b-2xl">
+            <div>
+              <h2 className="text-3xl font-light">Shopping Bag</h2>
+              <p className="text-sm text-gray-300 mt-1">{cartCount} item{cartCount !== 1 ? 's' : ''}</p>
+            </div>
             <button
               onClick={onClose}
-              className="text-2xl hover:text-gray-600 transition"
+              className="text-2xl hover:scale-110 transition bg-white/20 w-10 h-10 rounded-full flex items-center justify-center"
             >
               ✕
             </button>
           </div>
           
+          {/* Items List */}
           <div className="flex-1 overflow-y-auto p-6">
             {cartCount === 0 ? (
-              <p className="text-gray-500 text-center py-10">Your cart is empty</p>
+              <div className="text-center py-16">
+                <div className="text-5xl mb-4">🛍️</div>
+                <p className="text-gray-500 text-lg">Your bag is empty</p>
+                <p className="text-gray-400 text-sm mt-2">Add items to get started</p>
+              </div>
             ) : (
-              <div className="space-y-4">
-                {Array.from({ length: cartCount }).map((_, i) => (
-                  <div key={i} className="flex justify-between items-center p-4 bg-gray-50 rounded">
-                    <span className="text-sm">Item {i + 1}</span>
+              <div className="space-y-3">
+                {cartItems.map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="group flex justify-between items-start p-4 bg-white rounded-xl border border-gray-200 hover:border-black hover:shadow-md transition"
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-800">{item}</p>
+                      <p className="text-xs text-gray-500 mt-1">Item #{i + 1}</p>
+                    </div>
                     <button
                       onClick={onRemoveItem}
-                      className="text-red-500 hover:text-red-700 transition text-sm"
+                      className="ml-2 text-gray-400 hover:text-red-500 hover:scale-110 transition text-lg"
                     >
-                      Remove
+                      ✕
                     </button>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="border-t p-6 space-y-3">
-            <div className="flex justify-between">
-              <span className="font-semibold">Total Items:</span>
-              <span className="font-semibold">{cartCount}</span>
+          {/* Footer */}
+          {cartCount > 0 && (
+            <div className="border-t border-gray-200 bg-white p-6 space-y-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-3 mb-4"
+              >
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-semibold text-gray-800">₹{cartCount * 50}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Shipping</span>
+                  <span className="font-semibold text-green-600">Free</span>
+                </div>
+                <div className="h-px bg-gray-200"></div>
+                <div className="flex justify-between text-lg">
+                  <span className="font-semibold text-gray-800">Total</span>
+                  <span className="font-bold text-black text-xl">₹{cartCount * 50}</span>
+                </div>
+              </motion.div>
+
+              <button className="w-full bg-gradient-to-r from-black to-gray-800 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
+                Checkout
+              </button>
+              <button
+                onClick={onClose}
+                className="w-full bg-gray-100 text-black py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+              >
+                Continue Shopping
+              </button>
             </div>
-            <button className="w-full bg-black text-white py-3 hover:bg-gray-800 transition">
-              Checkout
-            </button>
-            <button
-              onClick={onClose}
-              className="w-full bg-gray-200 text-black py-3 hover:bg-gray-300 transition"
-            >
-              Continue Shopping
-            </button>
-          </div>
+          )}
         </motion.div>
       </motion.div>
     </>
@@ -553,7 +620,7 @@ export default function Home() {
           <div className="flex justify-between items-center mb-12">
             <div>
               <h2 className="text-4xl font-light mb-4">Elevating your daily style journey</h2>
-              <p className="text-gray-600">Zyrox Voice</p>
+              <p className="text-gray-600">ELUEE Voice</p>
             </div>
             <a href="#blog" className="bg-black text-white px-6 py-3 text-sm hover:bg-gray-800 transition">
               Read all blogs
@@ -627,22 +694,27 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="text-2xl font-light tracking-wider mb-6">ZYROX</div>
+              <div className="flex items-center space-x-2 mb-6">
+                <div className="relative h-10 w-10 flex items-center justify-center">
+                  <img src="/eluee.logo.jpeg" alt="ELUEE Logo" className="h-full w-auto object-contain" />
+                </div>
+                <div className="text-2xl font-light tracking-wider">ELUEE</div>
+              </div>
               <p className="text-gray-400 mb-6">Premium digital services crafted with minimal design and maximum impact.</p>
               <div className="flex space-x-4">
                 <a href="https://t.me/abbaszaidi10" target="_blank" className="text-gray-400 hover:text-white">Telegram</a>
-                <a href="https://instagram.com/zyroxwebservices" target="_blank" className="text-gray-400 hover:text-white">Instagram</a>
+                <a href="https://instagram.com/eluue2547" target="_blank" className="text-gray-400 hover:text-white">Instagram</a>
                 <a href="tel:+919457111036" className="text-gray-400 hover:text-white">Call</a>
               </div>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <div className="space-y-2 text-gray-400">
-                <a href="#" className="block hover:text-white">Home</a>
-                <a href="#" className="block hover:text-white">About</a>
-                <a href="#" className="block hover:text-white">Shop</a>
-                <a href="#" className="block hover:text-white">Blog</a>
-                <a href="#" className="block hover:text-white">Contact</a>
+            <a href="#home" className="block hover:text-white">Home</a>
+            <a href="#about" className="block hover:text-white">About</a>
+            <a href="#collections" className="block hover:text-white">Shop</a>
+            <a href="#blog" className="block hover:text-white">Blog</a>
+            <a href="https://instagram.com/eluue2547" target="_blank" className="block hover:text-white">Contact</a>
               </div>
             </div>
             <div>
@@ -655,16 +727,30 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <div className="space-y-2 text-gray-400">
-                <a href="mailto:contact@zyrox.com" className="block hover:text-white">contact@zyrox.com</a>
-                <a href="tel:+919457111036" className="block hover:text-white">+919457111036</a>
-                <p>India</p>
+              <h4 className="font-semibold mb-4">Contact Us</h4>
+              <div className="space-y-3 text-gray-400">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Email</p>
+                  <a href="mailto:eluue2547@gmail.com" className="block hover:text-white transition">eluue2547@gmail.com</a>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Phone</p>
+                  <a href="tel:+919457111036" className="block hover:text-white transition">+91 9457111036</a>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Telegram</p>
+                  <a href="https://t.me/abbaszaidi10" target="_blank" className="block hover:text-white transition">@abbaszaidi10</a>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Instagram</p>
+                  <a href="https://instagram.com/eluue2547" target="_blank" className="block hover:text-white transition">@eluue2547</a>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">📍 India</p>
               </div>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© 2026 Zyrox. All rights reserved.</p>
+            <p>© 2026 ELUEE. All rights reserved.</p>
           </div>
         </div>
       </footer>
