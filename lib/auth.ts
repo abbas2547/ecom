@@ -1,7 +1,7 @@
 import type { NextAuthOptions, DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "./mongodb";
+import { connectToDatabase } from "./mongodb";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -13,7 +13,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: MongoDBAdapter(connectToDatabase()),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
@@ -30,13 +30,13 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (!user.email || !account) {
         return true;
       }
 
       try {
-        const client = await clientPromise;
+        const client = await connectToDatabase();
         const db = client.db("zyrox");
 
         // Check if user with this email already exists
@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           // If user exists but no account with this provider, link the new account
-          const result = await db.collection("accounts").updateOne(
+          await db.collection("accounts").updateOne(
             {
               userId: existingUser._id.toString(),
               provider: account.provider,
@@ -92,7 +92,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
-        const dbClient = await clientPromise;
+        const dbClient = await connectToDatabase();
         const db = dbClient.db("zyrox");
         const dbUser = await db.collection("users").findOne({ email: user.email! });
         session.user.role = dbUser?.role || "user";

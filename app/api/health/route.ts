@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Test MongoDB connection
-    const client = await clientPromise;
+    const client = await connectToDatabase();
     const db = client.db("zyrox");
 
     // Simple ping to check if database is accessible

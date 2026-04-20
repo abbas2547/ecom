@@ -13,10 +13,6 @@ export default function Users() {
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -34,6 +30,10 @@ export default function Users() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
   const updateUserRole = async (userId: string, newRole: 'admin' | 'user') => {
     try {

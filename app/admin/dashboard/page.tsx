@@ -11,10 +11,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
   const fetchStats = async () => {
     try {
       const response = await fetch("/api/admin/stats");
@@ -31,6 +27,10 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchStats(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
   if (loading) {
     return (

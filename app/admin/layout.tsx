@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import clientPromise from "@/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   // Check if user is admin
-  const client = await clientPromise;
+  const client = await connectToDatabase();
   const db = client.db("zyrox");
   const user = await db.collection("users").findOne({ email: session.user.email });
 

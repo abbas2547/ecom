@@ -27,7 +27,7 @@ export default function AdminSetup() {
       } else {
         setMessage(`❌ Error: ${data.error}`);
       }
-    } catch (error) {
+    } catch {
       setMessage("❌ Error: Failed to set up admin access");
     } finally {
       setLoading(false);

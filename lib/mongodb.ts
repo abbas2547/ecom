@@ -1,16 +1,25 @@
 import { MongoClient } from "mongodb";
 
-const uri = process.env.MONGODB_URI!;
+const uri = process.env.MONGODB_URI;
 const options = {};
 
-let client;
-let clientPromise: Promise<MongoClient>;
+let clientPromise: Promise<MongoClient> | null = null;
 
-if (!((global as any)._mongoClientPromise)) {
-  client = new MongoClient(uri, options);
-  (global as any)._mongoClientPromise = client.connect();
+function getMongoClientPromise() {
+  if (!clientPromise) {
+    if (!uri) {
+      throw new Error(
+        "Missing required environment variable MONGODB_URI. Add it to .env.local and your Vercel environment settings."
+      );
+    }
+
+    const client = new MongoClient(uri, options);
+    clientPromise = client.connect();
+  }
+
+  return clientPromise;
 }
 
-clientPromise = (global as any)._mongoClientPromise;
-
-export default clientPromise;
+export function connectToDatabase() {
+  return getMongoClientPromise();
+}

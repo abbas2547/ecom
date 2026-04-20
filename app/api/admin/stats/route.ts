@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import clientPromise from "@/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 import { DashboardStats } from "@/lib/types";
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify admin status from database
-    const client = await clientPromise;
+    const client = await connectToDatabase();
     const db = client.db("zyrox");
     const user = await db.collection("users").findOne({ email: session.user.email });
 

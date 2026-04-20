@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import clientPromise from "@/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log("Setup API called");
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     console.log("User email:", session.user.email);
 
-    const client = await clientPromise;
+    const client = await connectToDatabase();
     console.log("MongoDB client connected");
 
     const db = client.db("zyrox");

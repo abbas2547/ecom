@@ -15,16 +15,12 @@ export default function Diagnostics() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkHealth();
-  }, []);
-
   const checkHealth = async () => {
     try {
       const response = await fetch("/api/health");
       const data = await response.json();
       setHealth(data);
-    } catch (error) {
+    } catch {
       setHealth({
         status: "error",
         database: "unknown",
@@ -35,6 +31,10 @@ export default function Diagnostics() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    checkHealth(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
   if (loading) {
     return (

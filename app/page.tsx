@@ -3,6 +3,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 
 // ---------------- TYPES ----------------
 
@@ -71,13 +72,20 @@ const collections = [
   }
 ]
 
-// ---------------- COMPONENTS ----------------
+// Navbar now accepts cart props
+function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onToggleCart: () => void, showCart: boolean }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-function Navbar() {
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
   return (
     <nav className="fixed top-0 left-0 w-full bg-transparent backdrop-blur-md border-b border-white/20 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center bg-black/10">
         <div className="text-2xl font-light tracking-wider text-white">ZYROX</div>
+        
+        {/* Desktop Menu */}
         <div className="hidden md:flex space-x-8 text-sm text-white">
           <a href="#home" className="hover:text-gray-200 transition">Home</a>
           <a href="#about" className="hover:text-gray-200 transition">About</a>
@@ -86,16 +94,126 @@ function Navbar() {
           <a href="#contact" className="hover:text-gray-200 transition">Contact</a>
           <a href="/login" className="hover:text-gray-200 transition">Login</a>
         </div>
+
+        {/* Right Icons */}
         <div className="flex items-center space-x-4 text-white">
-          <button className="text-xl">🛒</button>
-          <button className="md:hidden">☰</button>
+          {/* Cart Button */}
+          <button 
+            onClick={onToggleCart}
+            className="text-xl relative hover:scale-110 transition cursor-pointer"
+          >
+            🛒
+            {cartCount > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
+
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="md:hidden text-xl hover:scale-110 transition cursor-pointer"
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="md:hidden bg-black/95 border-b border-white/20"
+        >
+          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col space-y-3 text-sm text-white">
+            <a href="#home" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Home</a>
+            <a href="#about" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>About</a>
+            <a href="#collections" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Shop</a>
+            <a href="#blog" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Blog</a>
+            <a href="#contact" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+            <a href="/login" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Login</a>
+          </div>
+        </motion.div>
+      )}
     </nav>
   )
 }
 
-function ProductCard({ product, index }: { product: Product, index: number }) {
+// Cart Sidebar Component
+function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boolean, onClose: () => void, cartCount: number, onRemoveItem: () => void }) {
+  if (!isOpen) return null
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/40 z-40"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ x: 400 }}
+          animate={{ x: 0 }}
+          exit={{ x: 400 }}
+          className="fixed right-0 top-0 h-screen w-80 bg-white z-50 flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center p-6 border-b">
+            <h2 className="text-2xl font-light">Shopping Cart</h2>
+            <button
+              onClick={onClose}
+              className="text-2xl hover:text-gray-600 transition"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-6">
+            {cartCount === 0 ? (
+              <p className="text-gray-500 text-center py-10">Your cart is empty</p>
+            ) : (
+              <div className="space-y-4">
+                {Array.from({ length: cartCount }).map((_, i) => (
+                  <div key={i} className="flex justify-between items-center p-4 bg-gray-50 rounded">
+                    <span className="text-sm">Item {i + 1}</span>
+                    <button
+                      onClick={onRemoveItem}
+                      className="text-red-500 hover:text-red-700 transition text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="border-t p-6 space-y-3">
+            <div className="flex justify-between">
+              <span className="font-semibold">Total Items:</span>
+              <span className="font-semibold">{cartCount}</span>
+            </div>
+            <button className="w-full bg-black text-white py-3 hover:bg-gray-800 transition">
+              Checkout
+            </button>
+            <button
+              onClick={onClose}
+              className="w-full bg-gray-200 text-black py-3 hover:bg-gray-300 transition"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </>
+  )
+}
+
+function ProductCard({ product, index, onAddToCart }: { product: Product, index: number, onAddToCart?: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -121,12 +239,20 @@ function ProductCard({ product, index }: { product: Product, index: number }) {
         )}
       </div>
       <h3 className="text-sm font-medium mb-1">{product.name}</h3>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 mb-3">
         <span className="text-lg font-semibold">₹{product.price}</span>
         {product.originalPrice && (
           <span className="text-sm text-gray-500 line-through">₹{product.originalPrice}</span>
         )}
       </div>
+      {onAddToCart && (
+        <button
+          onClick={onAddToCart}
+          className="w-full bg-black text-white py-2 text-xs hover:bg-gray-800 transition rounded"
+        >
+          Add to Cart
+        </button>
+      )}
     </motion.div>
   )
 }
@@ -192,9 +318,27 @@ function FeatureCard({ title, description, features, image }: { title: string, d
 // ---------------- PAGE ----------------
 
 export default function Home() {
+  const [cartCount, setCartCount] = useState(0)
+  const [showCart, setShowCart] = useState(false)
+
+  const addToCart = () => {
+    setCartCount(cartCount + 1)
+  }
+
+  const removeFromCart = () => {
+    if (cartCount > 0) {
+      setCartCount(cartCount - 1)
+    }
+  }
+
+  const toggleCart = () => {
+    setShowCart(!showCart)
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      <Navbar cartCount={cartCount} onToggleCart={toggleCart} showCart={showCart} />
+      <CartSidebar isOpen={showCart} onClose={toggleCart} cartCount={cartCount} onRemoveItem={removeFromCart} />
 
       {/* Hero */}
       <section id="home" className="pt-24 pb-20 px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center' }}>
@@ -246,7 +390,7 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {newArrivals.map((product, i) => (
-              <ProductCard key={i} product={product} index={i} />
+              <ProductCard key={i} product={product} index={i} onAddToCart={addToCart} />
             ))}
           </div>
         </div>
@@ -297,7 +441,7 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-4 gap-8">
             {bestSellers.map((product, i) => (
-              <ProductCard key={i} product={product} index={i} />
+              <ProductCard key={i} product={product} index={i} onAddToCart={addToCart} />
             ))}
           </div>
           <div className="text-center mt-12">
