@@ -50,36 +50,3 @@ export interface DashboardStats {
   recentUsers: User[];
   recentOrders: Order[];
 }
-  _id?: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  image: string;
-  stock: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Order {
-  _id?: string;
-  userId: string;
-  products: Array<{
-    productId: string;
-    quantity: number;
-    price: number;
-  }>;
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface DashboardStats {
-  totalUsers: number;
-  totalProducts: number;
-  totalOrders: number;
-  totalRevenue: number;
-  recentUsers: User[];
-  recentOrders: Order[];
-}

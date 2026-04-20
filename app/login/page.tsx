@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
@@ -19,7 +20,7 @@ function GoogleIcon() {
   );
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
@@ -135,5 +136,13 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-white">Loading login...</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
