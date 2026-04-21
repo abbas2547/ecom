@@ -40,6 +40,7 @@ export interface Order {
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   createdAt: Date;
   updatedAt: Date;
+  cancellationReason?: string;
 }
 
 export interface DashboardStats {
