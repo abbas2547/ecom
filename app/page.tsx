@@ -145,7 +145,7 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
           exit={{ opacity: 0, y: -10 }}
           className="md:hidden bg-black/95 border-b border-white/20"
         >
-          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col space-y-3 text-sm text-white">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col space-y-3 text-sm text-white">
             <a href="#home" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Home</a>
             <a href="#about" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>About</a>
             <a href="#collections" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Shop</a>
@@ -441,7 +441,7 @@ export default function Home() {
       />
 
       {/* Hero */}
-      <section id="home" className="pt-24 pb-20 px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <section id="home" className="pt-24 pb-20 px-4 sm:px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="absolute inset-0 bg-black/30"></div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <motion.h1
@@ -477,7 +477,7 @@ export default function Home() {
       </section>
 
       {/* New Arrivals */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-12">
             <div>
@@ -497,7 +497,7 @@ export default function Home() {
       </section>
 
       {/* About */}
-      <section id="about" className="py-20 px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: '150%', backgroundPosition: 'center center' }}>
+      <section id="about" className="py-20 px-4 sm:px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: '150%', backgroundPosition: 'center center' }}>
         <div className="absolute inset-0 bg-white/25"></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.h2
@@ -533,7 +533,7 @@ export default function Home() {
       </section>
 
       {/* Best Sellers */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-light mb-4">Our signature best selling pieces</h2>
@@ -553,7 +553,7 @@ export default function Home() {
       </section>
 
       {/* Collections */}
-      <section id="collections" className="py-20 px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed' }}>
+      <section id="collections" className="py-20 px-4 sm:px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed' }}>
         <div className="absolute inset-0 bg-white/70"></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -567,7 +567,7 @@ export default function Home() {
       </section>
 
       {/* Customer Reviews */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section className="py-20 px-4 sm:px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-light mb-8">The voice of quality</h2>
           <p className="text-gray-600 mb-12 leading-relaxed">
@@ -596,7 +596,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-light mb-4">Where style meets ease</h2>
@@ -648,7 +648,7 @@ export default function Home() {
       </section>
 
       {/* Blog */}
-      <section id="blog" className="py-20 px-6 bg-gray-50">
+      <section id="blog" className="py-20 px-4 sm:px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-12">
             <div>
@@ -681,7 +681,7 @@ export default function Home() {
       </section>
 
       {/* Community */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-light mb-4">See our community in modern silhouettes</h2>
@@ -705,7 +705,7 @@ export default function Home() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-20 px-6 bg-black text-white">
+      <section className="py-20 px-4 sm:px-6 bg-black text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-light mb-4">Subscribe to our newsletter</h2>
           <p className="text-gray-300 mb-8">Stay connected with our latest updates and exclusive offers.</p>
@@ -723,7 +723,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="py-20 px-6 bg-gray-900 text-white">
+      <footer id="contact" className="py-20 px-4 sm:px-6 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
