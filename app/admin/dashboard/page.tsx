@@ -29,7 +29,13 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchStats(); // eslint-disable-line react-hooks/set-state-in-effect
+    fetchStats();
+    
+    // Auto-refresh stats every 5 seconds to show new orders
+    const interval = setInterval(fetchStats, 5000);
+    
+    return () => clearInterval(interval);
+    // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
   if (loading) {
