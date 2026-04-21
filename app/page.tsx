@@ -3,7 +3,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // ---------------- TYPES ----------------
 
@@ -89,14 +89,13 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-transparent backdrop-blur-md border-b border-white/20 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center bg-black/10">
-        <div className="flex items-center space-x-3">
-         
-          <div className="text-2xl font-light tracking-wider text-white">ELUEE</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-black/10">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="text-lg sm:text-2xl font-light tracking-wider text-white">ELUEE</div>
         </div>
         
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-8 text-sm text-white">
+        <div className="hidden md:flex space-x-6 lg:space-x-8 text-xs lg:text-sm text-white">
           <a href="#home" className="hover:text-gray-200 transition">Home</a>
           <a href="#about" className="hover:text-gray-200 transition">About</a>
           <a href="#collections" className="hover:text-gray-200 transition">Shop</a>
@@ -106,15 +105,15 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
         </div>
 
         {/* Right Icons */}
-        <div className="flex items-center space-x-4 text-white">
+        <div className="flex items-center space-x-3 sm:space-x-4 text-white">
           {/* Cart Button */}
           <button 
             onClick={onToggleCart}
-            className="text-xl relative hover:scale-110 transition cursor-pointer"
+            className="text-lg sm:text-xl relative hover:scale-110 transition cursor-pointer"
           >
             🛒
             {cartCount > 0 && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs">
                 {cartCount}
               </span>
             )}
@@ -123,7 +122,7 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
           {/* Mobile Menu Button */}
           <button 
             onClick={toggleMobileMenu}
-            className="md:hidden text-xl hover:scale-110 transition cursor-pointer"
+            className="md:hidden text-lg sm:text-xl hover:scale-110 transition cursor-pointer"
           >
             {mobileMenuOpen ? '✕' : '☰'}
           </button>
@@ -138,7 +137,7 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
           exit={{ opacity: 0, y: -10 }}
           className="md:hidden bg-black/95 border-b border-white/20"
         >
-          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col space-y-3 text-sm text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col space-y-2 text-xs sm:text-sm text-white">
             <a href="#home" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Home</a>
             <a href="#about" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>About</a>
             <a href="#collections" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Shop</a>
@@ -188,48 +187,48 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
           animate={{ x: 0 }}
           exit={{ x: 400 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed right-0 top-0 h-screen w-full max-w-sm bg-gradient-to-br from-white to-gray-50 z-50 flex flex-col shadow-2xl"
+          className="fixed right-0 top-0 h-screen w-full max-w-md sm:max-w-sm bg-gradient-to-br from-white to-gray-50 z-50 flex flex-col shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-black to-gray-800 text-white p-6 flex justify-between items-center rounded-b-2xl">
+          <div className="bg-gradient-to-r from-black to-gray-800 text-white p-4 sm:p-6 flex justify-between items-center rounded-b-2xl">
             <div>
-              <h2 className="text-3xl font-light">Shopping Bag</h2>
-              <p className="text-sm text-gray-300 mt-1">{cartCount} item{cartCount !== 1 ? 's' : ''}</p>
+              <h2 className="text-2xl sm:text-3xl font-light">Shopping Bag</h2>
+              <p className="text-xs sm:text-sm text-gray-300 mt-1">{cartCount} item{cartCount !== 1 ? 's' : ''}</p>
             </div>
             <button
               onClick={onClose}
-              className="text-2xl hover:scale-110 transition bg-white/20 w-10 h-10 rounded-full flex items-center justify-center"
+              className="text-xl sm:text-2xl hover:scale-110 transition bg-white/20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-base"
             >
               ✕
             </button>
           </div>
           
           {/* Items List */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
             {cartCount === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-5xl mb-4">🛍️</div>
-                <p className="text-gray-500 text-lg">Your bag is empty</p>
-                <p className="text-gray-400 text-sm mt-2">Add items to get started</p>
+              <div className="text-center py-12 sm:py-16">
+                <div className="text-4xl sm:text-5xl mb-4">🛍️</div>
+                <p className="text-gray-500 text-base sm:text-lg">Your bag is empty</p>
+                <p className="text-gray-400 text-xs sm:text-sm mt-2">Add items to get started</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {cartItems.map((item, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="group flex justify-between items-start p-4 bg-white rounded-xl border border-gray-200 hover:border-black hover:shadow-md transition"
+                    className="group flex justify-between items-start p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-black hover:shadow-md transition"
                   >
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800">{item}</p>
+                      <p className="text-xs sm:text-sm font-medium text-gray-800">{item}</p>
                       <p className="text-xs text-gray-500 mt-1">Item #{i + 1}</p>
                     </div>
                     <button
                       onClick={onRemoveItem}
-                      className="ml-2 text-gray-400 hover:text-red-500 hover:scale-110 transition text-lg"
+                      className="ml-2 text-gray-400 hover:text-red-500 hover:scale-110 transition text-base sm:text-lg"
                     >
                       ✕
                     </button>
@@ -241,34 +240,34 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
 
           {/* Footer */}
           {cartCount > 0 && (
-            <div className="border-t border-gray-200 bg-white p-6 space-y-4">
+            <div className="border-t border-gray-200 bg-white p-4 sm:p-6 space-y-3 sm:space-y-4">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="space-y-3 mb-4"
+                className="space-y-2 sm:space-y-3 mb-3 sm:mb-4"
               >
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-semibold text-gray-800">₹{cartCount * 50}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Shipping</span>
                   <span className="font-semibold text-green-600">Free</span>
                 </div>
                 <div className="h-px bg-gray-200"></div>
-                <div className="flex justify-between text-lg">
+                <div className="flex justify-between text-base sm:text-lg">
                   <span className="font-semibold text-gray-800">Total</span>
-                  <span className="font-bold text-black text-xl">₹{cartCount * 50}</span>
+                  <span className="font-bold text-black text-lg sm:text-xl">₹{cartCount * 50}</span>
                 </div>
               </motion.div>
 
-              <button className="w-full bg-gradient-to-r from-black to-gray-800 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
+              <a href="/checkout" className="w-full bg-gradient-to-r from-black to-gray-800 text-white py-2 sm:py-3 rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105 block text-center text-sm sm:text-base">
                 Checkout
-              </button>
+              </a>
               <button
                 onClick={onClose}
-                className="w-full bg-gray-100 text-black py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+                className="w-full bg-gray-100 text-black py-2 sm:py-3 rounded-xl font-semibold hover:bg-gray-200 transition text-sm sm:text-base"
               >
                 Continue Shopping
               </button>
@@ -388,13 +387,27 @@ export default function Home() {
   const [cartCount, setCartCount] = useState(0)
   const [showCart, setShowCart] = useState(false)
 
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('cartCount')
+      if (stored) {
+        setCartCount(parseInt(stored))
+      }
+    }
+  }, [])
+
   const addToCart = () => {
-    setCartCount(cartCount + 1)
+    const newCount = cartCount + 1
+    setCartCount(newCount)
+    localStorage.setItem('cartCount', newCount.toString())
   }
 
   const removeFromCart = () => {
     if (cartCount > 0) {
-      setCartCount(cartCount - 1)
+      const newCount = cartCount - 1
+      setCartCount(newCount)
+      localStorage.setItem('cartCount', newCount.toString())
     }
   }
 
@@ -408,14 +421,14 @@ export default function Home() {
       <CartSidebar isOpen={showCart} onClose={toggleCart} cartCount={cartCount} onRemoveItem={removeFromCart} />
 
       {/* Hero */}
-      <section id="home" className="pt-24 pb-20 px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <section id="home" className="pt-20 sm:pt-24 pb-16 sm:pb-20 px-4 sm:px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="absolute inset-0 bg-black/30"></div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-6xl md:text-8xl font-light tracking-wider mb-8 text-gray-100"
+            className="text-4xl sm:text-6xl md:text-8xl font-light tracking-wider mb-6 sm:mb-8 text-gray-100"
           >
             Premium wear for modern living
           </motion.h1>
@@ -423,7 +436,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed"
+            className="text-base sm:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed px-4"
           >
             Discover our new range of soft clothes made for your daily look and your best days with the finest fabrics.
           </motion.p>
@@ -431,12 +444,12 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex justify-center space-x-6 mt-12"
+            className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 mt-8 sm:mt-12"
           >
-            <a href="#collections" className="bg-gray-800 text-white px-8 py-4 text-sm hover:bg-gray-700 transition block">
+            <a href="#collections" className="bg-gray-800 text-white px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm hover:bg-gray-700 transition block">
               See all collections
             </a>
-            <a href="#contact" className="border border-gray-800 bg-gray-900 text-white px-8 py-4 text-sm hover:bg-gray-700 transition block text-center">
+            <a href="https://instagram.com/eluue2547" target="_blank" className="border border-gray-300 text-gray-100 px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm hover:bg-gray-900 transition block">
               Contact us
             </a>
           </motion.div>
