@@ -1,10 +1,11 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 
-export default function CheckoutSuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const orderId = searchParams.get('orderId')
@@ -59,7 +60,7 @@ export default function CheckoutSuccessPage() {
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
           <p className="text-sm text-blue-900">
-            📧 A confirmation email has been sent to your inbox
+            A confirmation email has been sent to your inbox
           </p>
         </div>
 
@@ -89,5 +90,13 @@ export default function CheckoutSuccessPage() {
         </p>
       </motion.div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
   )
 }
