@@ -4,6 +4,7 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 // ---------------- TYPES ----------------
 
@@ -14,6 +15,11 @@ interface Product {
   image: string
   isNew?: boolean
   isBestSeller?: boolean
+  id: string
+}
+
+interface CartItem extends Product {
+  quantity: number
 }
 
 interface Collection {
@@ -24,26 +30,26 @@ interface Collection {
 }
 
 const newArrivals = [
-  { name: 'Textured Knitted Shirt', price: 59, originalPrice: 79, image: 'https://framerusercontent.com/images/VW4VJmmdCt9WP6FoBGWnqDq6VS8.png?width=950&height=1024', isNew: true },
-  { name: 'Structured Trench Coat', price: 210, originalPrice: 280, image: 'https://framerusercontent.com/images/liIxg0opfCsW1pRixs56aS3Aj4.jpeg?scale-down-to=1024&width=1248&height=816', isNew: true },
-  { name: 'Mini Denim Overalls', price: 45, originalPrice: 60, image: 'https://framerusercontent.com/images/imHLb05OBp3rVa7DL12JicfwlE.png?width=956&height=1024', isNew: true },
-  { name: 'Riviera Collar Shirt', price: 45, originalPrice: 60, image: 'https://framerusercontent.com/images/4zsYQkMwe0g61iw8T3MZGzvhak.png?width=961&height=1024', isNew: true },
-  { name: 'Stretch Jersey Tee', price: 65, originalPrice: 95, image: 'https://framerusercontent.com/images/0g1kqNpbGUbeCR7eDqHjDWiv4s.png?width=937&height=1024', isNew: true },
-  { name: 'Urban Utility Cargo', price: 90, originalPrice: 120, image: 'https://framerusercontent.com/images/cWQhDyWBhK2dbOvMbEutN5jO0s.png?width=891&height=1024', isNew: true },
-  { name: 'Minimalist Linen Blazer', price: 120, originalPrice: 160, image: 'https://framerusercontent.com/images/FFAlreqmltBbtn7iNy9lIQTMI.png?width=968&height=1024', isNew: true },
-  { name: 'Classic Denim Jacket', price: 95, originalPrice: 130, image: 'https://framerusercontent.com/images/6nknFZTNUtU9BA1FnqLy7dPrtmE.png?width=1024&height=1024', isNew: true },
-  { name: 'Soft Wool Cardigan', price: 110, originalPrice: 150, image: 'https://framerusercontent.com/images/XY7DXjHvJ7qxI2SulzDqvBiRbvw.png?width=944&height=1024', isNew: true },
+  { id: '1', name: 'Textured Knitted Shirt', price: 59, originalPrice: 79, image: 'https://framerusercontent.com/images/VW4VJmmdCt9WP6FoBGWnqDq6VS8.png?width=950&height=1024', isNew: true },
+  { id: '2', name: 'Structured Trench Coat', price: 210, originalPrice: 280, image: 'https://framerusercontent.com/images/liIxg0opfCsW1pRixs56aS3Aj4.jpeg?scale-down-to=1024&width=1248&height=816', isNew: true },
+  { id: '3', name: 'Mini Denim Overalls', price: 45, originalPrice: 60, image: 'https://framerusercontent.com/images/imHLb05OBp3rVa7DL12JicfwlE.png?width=956&height=1024', isNew: true },
+  { id: '4', name: 'Riviera Collar Shirt', price: 45, originalPrice: 60, image: 'https://framerusercontent.com/images/4zsYQkMwe0g61iw8T3MZGzvhak.png?width=961&height=1024', isNew: true },
+  { id: '5', name: 'Stretch Jersey Tee', price: 65, originalPrice: 95, image: 'https://framerusercontent.com/images/0g1kqNpbGUbeCR7eDqHjDWiv4s.png?width=937&height=1024', isNew: true },
+  { id: '6', name: 'Urban Utility Cargo', price: 90, originalPrice: 120, image: 'https://framerusercontent.com/images/cWQhDyWBhK2dbOvMbEutN5jO0s.png?width=891&height=1024', isNew: true },
+  { id: '7', name: 'Minimalist Linen Blazer', price: 120, originalPrice: 160, image: 'https://framerusercontent.com/images/FFAlreqmltBbtn7iNy9lIQTMI.png?width=968&height=1024', isNew: true },
+  { id: '8', name: 'Classic Denim Jacket', price: 95, originalPrice: 130, image: 'https://framerusercontent.com/images/6nknFZTNUtU9BA1FnqLy7dPrtmE.png?width=1024&height=1024', isNew: true },
+  { id: '9', name: 'Soft Wool Cardigan', price: 110, originalPrice: 150, image: 'https://framerusercontent.com/images/XY7DXjHvJ7qxI2SulzDqvBiRbvw.png?width=944&height=1024', isNew: true },
 ]
 
 const bestSellers = [
-  { name: 'Heavyweight Oversized Hoodie', price: 85, originalPrice: 110, image: 'https://framerusercontent.com/images/Mpbd0iQ2COOMJArbHqRZMQoFRA.png?width=838&height=1024', isBestSeller: true },
-  { name: 'Patterned Knit Sweater', price: 45, originalPrice: 90, image: 'https://framerusercontent.com/images/FNS875X1XnR0GJd4UpTh1Zms.png?width=817&height=987', isBestSeller: true },
-  { name: 'Quilted Bomber Jacket', price: 145, originalPrice: 180, image: 'https://framerusercontent.com/images/E6tqcNcNIbkMCzBYvnABQBtwcM.jpeg?scale-down-to=1024&width=1280&height=1280', isBestSeller: true },
-  { name: 'Hooded Puffer Vest', price: 45, originalPrice: 75, image: 'https://framerusercontent.com/images/MLJe7H4csZkBunu5nEk84enCjM.png?width=965&height=1024', isBestSeller: true },
-  { name: 'Premium Cotton T-Shirt', price: 35, originalPrice: 55, image: 'https://framerusercontent.com/images/VW4VJmmdCt9WP6FoBGWnqDq6VS8.png?width=950&height=1024', isBestSeller: true },
-  { name: 'Flex Jogger Pants', price: 75, originalPrice: 100, image: 'https://framerusercontent.com/images/liIxg0opfCsW1pRixs56aS3Aj4.jpeg?scale-down-to=1024&width=1248&height=816', isBestSeller: true },
-  { name: 'Sleek Chino Shorts', price: 55, originalPrice: 80, image: 'https://framerusercontent.com/images/imHLb05OBp3rVa7DL12JicfwlE.png?width=956&height=1024', isBestSeller: true },
-  { name: 'Essential V-Neck Tee', price: 39, originalPrice: 60, image: 'https://framerusercontent.com/images/4zsYQkMwe0g61iw8T3MZGzvhak.png?width=961&height=1024', isBestSeller: true },
+  { id: '10', name: 'Heavyweight Oversized Hoodie', price: 85, originalPrice: 110, image: 'https://framerusercontent.com/images/Mpbd0iQ2COOMJArbHqRZMQoFRA.png?width=838&height=1024', isBestSeller: true },
+  { id: '11', name: 'Patterned Knit Sweater', price: 45, originalPrice: 90, image: 'https://framerusercontent.com/images/FNS875X1XnR0GJd4UpTh1Zms.png?width=817&height=987', isBestSeller: true },
+  { id: '12', name: 'Quilted Bomber Jacket', price: 145, originalPrice: 180, image: 'https://framerusercontent.com/images/E6tqcNcNIbkMCzBYvnABQBtwcM.jpeg?scale-down-to=1024&width=1280&height=1280', isBestSeller: true },
+  { id: '13', name: 'Hooded Puffer Vest', price: 45, originalPrice: 75, image: 'https://framerusercontent.com/images/MLJe7H4csZkBunu5nEk84enCjM.png?width=965&height=1024', isBestSeller: true },
+  { id: '14', name: 'Premium Cotton T-Shirt', price: 35, originalPrice: 55, image: 'https://framerusercontent.com/images/VW4VJmmdCt9WP6FoBGWnqDq6VS8.png?width=950&height=1024', isBestSeller: true },
+  { id: '15', name: 'Flex Jogger Pants', price: 75, originalPrice: 100, image: 'https://framerusercontent.com/images/liIxg0opfCsW1pRixs56aS3Aj4.jpeg?scale-down-to=1024&width=1248&height=816', isBestSeller: true },
+  { id: '16', name: 'Sleek Chino Shorts', price: 55, originalPrice: 80, image: 'https://framerusercontent.com/images/imHLb05OBp3rVa7DL12JicfwlE.png?width=956&height=1024', isBestSeller: true },
+  { id: '17', name: 'Essential V-Neck Tee', price: 39, originalPrice: 60, image: 'https://framerusercontent.com/images/4zsYQkMwe0g61iw8T3MZGzvhak.png?width=961&height=1024', isBestSeller: true },
 ]
 
 const collections = [
@@ -89,7 +95,7 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-transparent backdrop-blur-md border-b border-white/20 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center bg-black/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-black/10">
         <div className="flex items-center space-x-3">
          
           <div className="text-2xl font-light tracking-wider text-white">ELUEE</div>
@@ -103,6 +109,7 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
           <a href="#blog" className="hover:text-gray-200 transition">Blog</a>
           <a href="https://instagram.com/eluue2547" target="_blank" className="hover:text-gray-200 transition">Contact</a>
           <a href="/login" className="hover:text-gray-200 transition">Login</a>
+          <a href="/orders" className="hover:text-gray-200 transition">Orders</a>
         </div>
 
         {/* Right Icons */}
@@ -145,6 +152,7 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
             <a href="#blog" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Blog</a>
             <a href="#contact" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Contact</a>
             <a href="/login" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Login</a>
+            <a href="/orders" className="hover:text-gray-200 transition py-2" onClick={() => setMobileMenuOpen(false)}>Orders</a>
           </div>
         </motion.div>
       )}
@@ -153,26 +161,25 @@ function Navbar({ cartCount, onToggleCart, showCart }: { cartCount: number, onTo
 }
 
 // Cart Sidebar Component - Enhanced Design
-function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boolean, onClose: () => void, cartCount: number, onRemoveItem: () => void }) {
+function CartSidebar({ 
+  isOpen, 
+  onClose, 
+  cartItems, 
+  onRemoveItem,
+  onCheckout 
+}: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  cartItems: CartItem[], 
+  onRemoveItem: (id: string) => void,
+  onCheckout: () => void
+}) {
+  const router = useRouter()
   if (!isOpen) return null
 
-  const cartItems = Array.from({ length: cartCount }).map((_, i) => {
-    const itemNames = [
-      'Textured Knitted Shirt',
-      'Structured Trench Coat',
-      'Mini Denim Overalls',
-      'Riviera Collar Shirt',
-      'Stretch Jersey Tee',
-      'Urban Utility Cargo',
-      'Minimalist Linen Blazer',
-      'Classic Denim Jacket',
-      'Heavyweight Oversized Hoodie',
-      'Patterned Knit Sweater',
-      'Quilted Bomber Jacket',
-      'Hooded Puffer Vest',
-    ]
-    return itemNames[i % itemNames.length]
-  })
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const shipping = cartItems.length > 0 ? 40 : 0
+  const total = subtotal + shipping
 
   return (
     <>
@@ -195,7 +202,7 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
           <div className="bg-gradient-to-r from-black to-gray-800 text-white p-6 flex justify-between items-center rounded-b-2xl">
             <div>
               <h2 className="text-3xl font-light">Shopping Bag</h2>
-              <p className="text-sm text-gray-300 mt-1">{cartCount} item{cartCount !== 1 ? 's' : ''}</p>
+              <p className="text-sm text-gray-300 mt-1">{cartItems.length} item{cartItems.length !== 1 ? 's' : ''}</p>
             </div>
             <button
               onClick={onClose}
@@ -207,7 +214,7 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
           
           {/* Items List */}
           <div className="flex-1 overflow-y-auto p-6">
-            {cartCount === 0 ? (
+            {cartItems.length === 0 ? (
               <div className="text-center py-16">
                 <div className="text-5xl mb-4">🛍️</div>
                 <p className="text-gray-500 text-lg">Your bag is empty</p>
@@ -217,18 +224,18 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
               <div className="space-y-3">
                 {cartItems.map((item, i) => (
                   <motion.div
-                    key={i}
+                    key={item.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                     className="group flex justify-between items-start p-4 bg-white rounded-xl border border-gray-200 hover:border-black hover:shadow-md transition"
                   >
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800">{item}</p>
-                      <p className="text-xs text-gray-500 mt-1">Item #{i + 1}</p>
+                      <p className="text-sm font-medium text-gray-800">{item.name}</p>
+                      <p className="text-xs text-gray-500 mt-1">₹{item.price} x {item.quantity}</p>
                     </div>
                     <button
-                      onClick={onRemoveItem}
+                      onClick={() => onRemoveItem(item.id)}
                       className="ml-2 text-gray-400 hover:text-red-500 hover:scale-110 transition text-lg"
                     >
                       ✕
@@ -240,7 +247,7 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
           </div>
 
           {/* Footer */}
-          {cartCount > 0 && (
+          {cartItems.length > 0 && (
             <div className="border-t border-gray-200 bg-white p-6 space-y-4">
               <motion.div
                 initial={{ opacity: 0 }}
@@ -250,20 +257,23 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
               >
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-semibold text-gray-800">₹{cartCount * 50}</span>
+                  <span className="font-semibold text-gray-800">₹{total}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-semibold text-green-600">Free</span>
+                  <span className="font-semibold text-gray-800">₹40</span>
                 </div>
                 <div className="h-px bg-gray-200"></div>
                 <div className="flex justify-between text-lg">
                   <span className="font-semibold text-gray-800">Total</span>
-                  <span className="font-bold text-black text-xl">₹{cartCount * 50}</span>
+                  <span className="font-bold text-black text-xl">₹{total + 40}</span>
                 </div>
               </motion.div>
 
-              <button className="w-full bg-gradient-to-r from-black to-gray-800 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
+              <button 
+                onClick={onCheckout}
+                className="w-full bg-gradient-to-r from-black to-gray-800 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105"
+              >
                 Checkout
               </button>
               <button
@@ -280,7 +290,7 @@ function CartSidebar({ isOpen, onClose, cartCount, onRemoveItem }: { isOpen: boo
   )
 }
 
-function ProductCard({ product, index, onAddToCart }: { product: Product, index: number, onAddToCart?: () => void }) {
+function ProductCard({ product, index, onAddToCart }: { product: Product, index: number, onAddToCart?: (product: Product) => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -314,7 +324,7 @@ function ProductCard({ product, index, onAddToCart }: { product: Product, index:
       </div>
       {onAddToCart && (
         <button
-          onClick={onAddToCart}
+          onClick={() => onAddToCart(product)}
           className="w-full bg-black text-white py-2 text-xs hover:bg-gray-800 transition rounded"
         >
           Add to Cart
@@ -385,27 +395,50 @@ function FeatureCard({ title, description, features, image }: { title: string, d
 // ---------------- PAGE ----------------
 
 export default function Home() {
-  const [cartCount, setCartCount] = useState(0)
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [showCart, setShowCart] = useState(false)
+  const router = useRouter()
 
-  const addToCart = () => {
-    setCartCount(cartCount + 1)
+  const addToCart = (product: Product) => {
+    setCartItems(prev => {
+      const existing = prev.find(item => item.id === product.id)
+      if (existing) {
+        return prev.map(item => 
+          item.id === product.id 
+            ? { ...item, quantity: item.quantity + 1 } 
+            : item
+        )
+      }
+      return [...prev, { ...product, quantity: 1 }]
+    })
   }
 
-  const removeFromCart = () => {
-    if (cartCount > 0) {
-      setCartCount(cartCount - 1)
-    }
+  const removeFromCart = (id: string) => {
+    setCartItems(prev => prev.filter(item => item.id !== id))
   }
 
   const toggleCart = () => {
     setShowCart(!showCart)
   }
 
+  const handleCheckout = () => {
+    // Store cart items in localStorage for checkout page
+    localStorage.setItem('checkoutCart', JSON.stringify(cartItems))
+    router.push('/checkout')
+  }
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar cartCount={cartCount} onToggleCart={toggleCart} showCart={showCart} />
-      <CartSidebar isOpen={showCart} onClose={toggleCart} cartCount={cartCount} onRemoveItem={removeFromCart} />
+      <CartSidebar 
+        isOpen={showCart} 
+        onClose={toggleCart} 
+        cartItems={cartItems} 
+        onRemoveItem={removeFromCart}
+        onCheckout={handleCheckout}
+      />
 
       {/* Hero */}
       <section id="home" className="pt-24 pb-20 px-6 relative bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundAttachment: 'fixed', backgroundSize: 'cover', backgroundPosition: 'center' }}>
@@ -506,7 +539,7 @@ export default function Home() {
             <h2 className="text-4xl font-light mb-4">Our signature best selling pieces</h2>
             <p className="text-gray-600">Best sellers</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
             {bestSellers.map((product, i) => (
               <ProductCard key={i} product={product} index={i} onAddToCart={addToCart} />
             ))}
@@ -654,7 +687,7 @@ export default function Home() {
             <h2 className="text-4xl font-light mb-4">See our community in modern silhouettes</h2>
             <p className="text-gray-600">Stay connected</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-6 mb-12">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 mb-12">
             <img src="https://framerusercontent.com/images/3BJsJKp6d3GMb73lMFLvun3bVxE.png?scale-down-to=1024&width=1082&height=1200" alt="" className="w-full h-64 object-cover rounded-lg" />
             <img src="https://framerusercontent.com/images/Q2qaxWvHcpcMDMRF6r6oA7jcK9Q.jpg?scale-down-to=512&width=920&height=878" alt="" className="w-full h-64 object-cover rounded-lg" />
             <img src="https://framerusercontent.com/images/jz6J8tN19rBotBJ08ib9LED2s8.png?scale-down-to=1024&width=900&height=1200" alt="" className="w-full h-64 object-cover rounded-lg" />

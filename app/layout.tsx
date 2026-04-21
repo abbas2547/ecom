@@ -34,6 +34,12 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "ELUEE",
   description: "Premium fashion storefront with secure social login",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({
