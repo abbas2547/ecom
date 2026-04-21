@@ -430,7 +430,7 @@ export default function Home() {
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <Navbar cartCount={cartCount} onToggleCart={toggleCart} showCart={showCart} />
       <CartSidebar 
         isOpen={showCart} 
