@@ -5,57 +5,53 @@ import { connectToDatabase } from "@/lib/mongodb";
 
 export const runtime = 'nodejs';
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
-    console.log("Setup API called");
-
     const session = await getServerSession(authOptions);
-    console.log("Session:", session ? "exists" : "null");
 
-    if (!session?.user?.email) {
-      console.log("No session or email");
+    if (!session?.user?.email || !session?.user?.id) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    console.log("User email:", session.user.email);
+    const { storeName } = await request.json();
+
+    if (!storeName || storeName.trim() === "") {
+      return NextResponse.json({ error: "Store name is required" }, { status: 400 });
+    }
 
     const client = await connectToDatabase();
-    console.log("MongoDB client connected");
-
     const db = client.db("zyrox");
-    console.log("Got database");
 
     // Check if a pending request already exists for this user
-    const existingRequest = await db.collection("adminRequests").findOne({
+    const existingRequest = await db.collection("sellerRequests").findOne({
       userEmail: session.user.email,
       status: "pending",
     });
 
     if (existingRequest) {
       return NextResponse.json({
-        error: "A pending admin request already exists for this user.",
+        error: "A pending seller request already exists for this user.",
       }, { status: 409 });
     }
 
-    // Create a new admin request
+    // Create a new seller request
     const newRequest = {
       userId: session.user.id,
       userEmail: session.user.email,
+      storeName: storeName.trim(),
       status: "pending",
       createdAt: new Date(),
     };
 
-    const result = await db.collection("adminRequests").insertOne(newRequest);
-
-    console.log("Admin request created:", result);
+    const result = await db.collection("sellerRequests").insertOne(newRequest);
 
     return NextResponse.json({
       success: true,
-      message: "Admin request submitted for approval. Please wait for an admin to approve your request.",
+      message: "Seller request submitted for approval. Please wait for an admin to approve your request.",
       requestId: result.insertedId,
     });
   } catch (error) {
-    console.error("Error submitting admin request:", error);
+    console.error("Error submitting seller request:", error);
     return NextResponse.json({ 
       error: "Internal server error", 
       details: error instanceof Error ? error.message : "Unknown error",

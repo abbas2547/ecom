@@ -51,3 +51,34 @@ export interface DashboardStats {
   recentUsers: User[];
   recentOrders: Order[];
 }
+
+export interface AdminRequest {
+  _id?: string;
+  userId: string;
+  userEmail: string;
+  status: 'pending' | 'approved' | 'denied';
+  createdAt: Date;
+  approvedBy?: string; // Admin user ID who approved the request
+  approvedAt?: Date;
+}
+
+export interface Seller {
+  _id?: string;
+  userId: string;
+  userEmail: string;
+  storeName: string;
+  status: 'pending' | 'approved' | 'denied';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SellerRequest {
+  _id?: string;
+  userId: string;
+  userEmail: string;
+  storeName: string;
+  status: 'pending' | 'approved' | 'denied';
+  createdAt: Date;
+  approvedBy?: string;
+  approvedAt?: Date;
+}

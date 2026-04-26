@@ -1,0 +1,448 @@
+"use client";
+
+import { useSession, signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { DashboardStats, User, Order, AdminRequest, SellerRequest } from "@/lib/types";
+import Link from "next/link";
+
+export default function Dashboard() {
+  const { data: session } = useSession();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [pendingAdminRequests, setPendingAdminRequests] = useState<AdminRequest[]>([]);
+  const [pendingSellerRequests, setPendingSellerRequests] = useState<SellerRequest[]>([]);
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch("/api/admin/stats");
+      const adminRequestsResponse = await fetch("/api/admin/requests");
+      const sellerRequestsResponse = await fetch("/api/admin/seller-requests");
+
+      if (response.ok && adminRequestsResponse.ok && sellerRequestsResponse.ok) {
+        const data = await response.json();
+        const adminRequestsData = await adminRequestsResponse.json();
+        const sellerRequestsData = await sellerRequestsResponse.json();
+        
+        // Merge with demo orders from localStorage for testing
+        const demoOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const activeDemoOrders = demoOrders.filter((order: any) => order.status !== 'cancelled');
+
+        // Prioritize API recent orders, then fill with demo orders if needed
+        let combinedRecentOrders = [...(data.recentOrders || [])];
+        if (combinedRecentOrders.length < 5) {
+          const remainingSlots = 5 - combinedRecentOrders.length;
+          const demoRecentOrders = demoOrders.slice(0, remainingSlots); // Take only what's needed
+          combinedRecentOrders = [...combinedRecentOrders, ...demoRecentOrders];
+        }
+        combinedRecentOrders = combinedRecentOrders.slice(0, 5); // Ensure max 5
+        
+        setStats({
+          ...data,
+          totalOrders: (data.totalOrders || 0) + activeDemoOrders.length,
+          totalRevenue: (data.totalRevenue || 0) + activeDemoOrders.reduce((sum: number, o: any) => sum + o.total, 0),
+          recentOrders: combinedRecentOrders,
+          totalProducts: data.totalProducts || 0,
+        });
+        setPendingAdminRequests(adminRequestsData);
+        setPendingSellerRequests(sellerRequestsData);
+      } else {
+        // Fallback to demo data if API fails
+        const demoOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const activeDemoOrders = demoOrders.filter((order: any) => order.status !== 'cancelled');
+        setStats({
+          totalUsers: 0,
+          totalProducts: 0,
+          totalOrders: activeDemoOrders.length,
+          totalRevenue: activeDemoOrders.reduce((sum: number, o: any) => sum + o.total, 0),
+          recentUsers: [],
+          recentOrders: demoOrders.slice(0, 5)
+        });
+        setPendingAdminRequests([]);
+        setPendingSellerRequests([]);
+        setError("");
+      }
+    } catch (error) {
+      // Fallback to demo data if API fails
+      const demoOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      const activeDemoOrders = demoOrders.filter((order: any) => order.status !== 'cancelled');
+      setStats({
+        totalUsers: 0,
+        totalProducts: 0,
+        totalOrders: activeDemoOrders.length,
+        totalRevenue: activeDemoOrders.reduce((sum: number, o: any) => sum + o.total, 0),
+        recentUsers: [],
+        recentOrders: demoOrders.slice(0, 5)
+        });
+        setPendingAdminRequests([]);
+        setPendingSellerRequests([]);
+        setError("");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    useEffect(() => {
+      fetchStats(); // eslint-disable-line react-hooks/set-state-in-effect
+    }, []);
+
+    const handleApproveRequest = async (requestId: string, userId: string, userEmail: string) => {
+      try {
+        const response = await fetch("/api/admin/requests", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ requestId, userId, userEmail, status: "approved" }),
+        });
+
+        if (response.ok) {
+          fetchStats(); // Refresh stats to update the list
+        } else {
+          console.error("Failed to approve request");
+        }
+      } catch (error) {
+        console.error("Error approving request:", error);
+      }
+    };
+
+    const handleDenyRequest = async (requestId: string) => {
+      try {
+        const response = await fetch("/api/admin/requests", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ requestId, status: "denied" }),
+        });
+
+        if (response.ok) {
+          fetchStats(); // Refresh stats to update the list
+        } else {
+          console.error("Failed to deny request");
+        }
+      } catch (error) {
+        console.error("Error denying request:", error);
+      }
+    };
+
+    const handleApproveSellerRequest = async (requestId: string, userId: string, userEmail: string, storeName: string) => {
+      try {
+        const response = await fetch("/api/admin/seller-requests", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ requestId, userId, userEmail, storeName, status: "approved" }),
+        });
+
+        if (response.ok) {
+          fetchStats(); // Refresh stats to update the list
+        } else {
+          console.error("Failed to approve seller request");
+        }
+      } catch (error) {
+        console.error("Error approving seller request:", error);
+      }
+    };
+
+    const handleDenySellerRequest = async (requestId: string) => {
+      try {
+        const response = await fetch("/api/admin/seller-requests", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ requestId, status: "denied" }),
+        });
+
+        if (response.ok) {
+          fetchStats(); // Refresh stats to update the list
+        } else {
+          console.error("Failed to deny seller request");
+        }
+      } catch (error) {
+        console.error("Error denying seller request:", error);
+      }
+    };
+  
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-violet-500"></div>
+        </div>
+      );
+    }
+  
+    if (error) {
+      return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <div className="text-red-400 text-center">
+            <p className="text-xl font-bold mb-4">{error}</p>
+            <button
+              onClick={() => {
+                setLoading(true);
+                setError("");
+                fetchStats();
+              }}
+              className="px-4 py-2 bg-violet-600 hover:bg-violet-700 rounded-lg"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+  
+    return (
+      <div className="min-h-screen bg-slate-950 text-white">
+        {/* Header */}
+        <header className="bg-slate-900/50 backdrop-blur-md border-b border-slate-800 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-6">
+              <div>
+                <h1 className="text-3xl font-bold text-violet-400">ELUEE Admin</h1>
+                <p className="text-slate-400">Welcome, {session?.user?.name || "Admin"}</p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <nav className="hidden sm:flex space-x-1">
+                  <Link
+                    href="/admin/dashboard"
+                    className="px-4 py-2 text-violet-400 border-b-2 border-violet-400 hover:text-violet-300"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/admin/dashboard/products"
+                    className="px-4 py-2 text-slate-400 hover:text-violet-400 transition-colors"
+                  >
+                    Products
+                  </Link>
+                  <Link
+                    href="/admin/dashboard/user"
+                    className="px-4 py-2 text-slate-400 hover:text-violet-400 transition-colors"
+                  >
+                    Users
+                  </Link>
+                </nav>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-sm font-medium"
+                >
+                  Sign Out
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' });
+                    } catch {}
+                    window.location.href = '/admin/login';
+                  }}
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm font-medium"
+                >
+                  Admin Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+  
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Total Users */}
+            <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-200 text-sm font-medium">Total Users</p>
+                  <p className="text-3xl font-bold text-blue-400 mt-2">{stats?.totalUsers || 0}</p>
+                </div>
+                <div className="text-4xl text-blue-400/40">👥</div>
+              </div>
+            </div>
+  
+            {/* Total Products */}
+            <div className="bg-gradient-to-br from-violet-500/20 to-violet-600/10 border border-violet-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-violet-200 text-sm font-medium">Total Products</p>
+                  <p className="text-3xl font-bold text-violet-400 mt-2">{stats?.totalProducts || 0}</p>
+                </div>
+                <div className="text-4xl text-violet-400/40">📦</div>
+              </div>
+            </div>
+  
+            {/* Total Orders */}
+            <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-emerald-200 text-sm font-medium">Total Orders</p>
+                  <p className="text-3xl font-bold text-emerald-400 mt-2">{stats?.totalOrders || 0}</p>
+                </div>
+                <div className="text-4xl text-emerald-400/40">🛒</div>
+              </div>
+            </div>
+  
+            {/* Total Revenue */}
+            <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-amber-200 text-sm font-medium">Total Revenue</p>
+                  <p className="text-3xl font-bold text-amber-400 mt-2">₹{(stats?.totalRevenue || 0).toFixed(2)}</p>
+                </div>
+                <div className="text-4xl text-amber-400/40">💰</div>
+              </div>
+            </div>
+          </div>
+  
+          {/* Recent Users and Orders */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Recent Users */}
+            <div className="bg-slate-900/50 backdrop-blur-md rounded-xl p-6 border border-slate-800">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-violet-400">Recent Users</h2>
+                <Link href="/admin/dashboard/user" className="text-sm text-violet-400 hover:text-violet-300">
+                  View All →
+                </Link>
+              </div>
+              <div className="space-y-3">
+                {stats?.recentUsers && stats.recentUsers.length > 0 ? (
+                  stats.recentUsers.map((user: User) => (
+                    <div key={user._id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg hover:bg-slate-800 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        {user.image ? (
+                          <img src={user.image} alt={user.name} className="w-10 h-10 rounded-full" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center">
+                            {user.name?.[0] || "U"}
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium text-white">{user.name || "Unknown"}</p>
+                          <p className="text-xs text-slate-400">{user.email}</p>
+                        </div>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        user.role === "admin" 
+                          ? "bg-red-500/20 text-red-400" 
+                          : "bg-slate-700 text-slate-300"
+                      }`}>
+                        {user.role}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-slate-400 text-center py-4">No users yet</p>
+                )}
+              </div>
+            </div>
+  
+            {/* Recent Orders */}
+            <div className="bg-slate-900/50 backdrop-blur-md rounded-xl p-6 border border-slate-800">
+              <h2 className="text-xl font-bold text-violet-400 mb-6">Recent Orders</h2>
+              <div className="space-y-3">
+                {stats?.recentOrders && stats.recentOrders.length > 0 ? (
+                  stats.recentOrders.map((order: Order) => (
+                    <div key={order._id} className="p-3 bg-slate-800/50 rounded-lg hover:bg-slate-800 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-white">Order #{order._id?.slice(-6)}</p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {order.products?.length || 0} product{(order.products?.length || 0) !== 1 ? 's' : ''}
+                          </p>
+                          {order.status === 'cancelled' && order.cancellationReason && (
+                            <p className="text-xs text-red-400 mt-1">Reason: {order.cancellationReason}</p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-emerald-400">₹{order.total.toFixed(2)}</p>
+                          <span className={`text-xs px-2 py-1 rounded mt-1 inline-block ${
+                            order.status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400' :
+                            order.status === 'shipped' ? 'bg-blue-500/20 text-blue-400' :
+                            order.status === 'processing' ? 'bg-yellow-500/20 text-yellow-400' :
+                            order.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                            'bg-slate-700 text-slate-300'
+                          }`}>
+                            {order.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-slate-400 text-center py-4">No orders yet</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Pending Admin Requests */}
+          <div className="bg-slate-900/50 backdrop-blur-md rounded-xl p-6 border border-slate-800 col-span-full">
+            <h2 className="text-xl font-bold text-violet-400 mb-6">Pending Admin Requests</h2>
+            <div className="space-y-3">
+              {pendingAdminRequests.length > 0 ? (
+                pendingAdminRequests.map((request: AdminRequest) => (
+                  <div key={request._id} className="p-3 bg-slate-800/50 rounded-lg flex justify-between items-center">
+                    <div>
+                      <p className="font-medium text-white">{request.userEmail}</p>
+                      <p className="text-xs text-slate-400">Requested on: {new Date(request.createdAt).toLocaleString()}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleApproveRequest(request._id as string, request.userId, request.userEmail)}
+                        className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleDenyRequest(request._id as string)}
+                        className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium"
+                      >
+                        Deny
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-center py-4">No pending admin requests</p>
+              )}
+            </div>
+          </div>
+
+          {/* Pending Seller Requests */}
+          <div className="bg-slate-900/50 backdrop-blur-md rounded-xl p-6 border border-slate-800 col-span-full">
+            <h2 className="text-xl font-bold text-violet-400 mb-6">Pending Seller Requests</h2>
+            <div className="space-y-3">
+              {pendingSellerRequests.length > 0 ? (
+                pendingSellerRequests.map((request: SellerRequest) => (
+                  <div key={request._id} className="p-3 bg-slate-800/50 rounded-lg flex justify-between items-center">
+                    <div>
+                      <p className="font-medium text-white">{request.userEmail}</p>
+                      <p className="text-xs text-slate-400">Store: {request.storeName}</p>
+                      <p className="text-xs text-slate-400">Requested on: {new Date(request.createdAt).toLocaleString()}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleApproveSellerRequest(request._id as string, request.userId, request.userEmail, request.storeName)}
+                        className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleDenySellerRequest(request._id as string)}
+                        className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium"
+                      >
+                        Deny
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400 text-center py-4">No pending seller requests</p>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }

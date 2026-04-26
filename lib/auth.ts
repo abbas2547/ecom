@@ -1,5 +1,7 @@
 import type { NextAuthOptions, DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import { connectToDatabase } from "./mongodb";
 
@@ -15,6 +17,29 @@ declare module "next-auth" {
 export const authOptions: NextAuthOptions = {
   adapter: MongoDBAdapter(connectToDatabase()),
   providers: [
+    // Allow email+password sign in (credentials)
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+        try {
+          const client = await connectToDatabase();
+          const db = client.db("zyrox");
+          const user = await db.collection("users").findOne({ email: credentials.email });
+          if (!user || !user.passwordHash) return null;
+          const valid = await bcrypt.compare(credentials.password, user.passwordHash);
+          if (!valid) return null;
+          return { id: user._id.toString(), name: user.name || user.email, email: user.email };
+        } catch (err) {
+          console.error("Credentials authorize error:", err);
+          return null;
+        }
+      },
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
